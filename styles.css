@@ -415,3 +415,21 @@ body {
   .hero-section { height: 60vh; padding: 0 20px; }
   .hero-content h1 { font-size: 32px; }
 }
+
+/* Hero Slider Fade Animation */
+.hero-backdrop {
+  transition: background-image 0.8s ease-in-out, opacity 0.8s ease-in-out;
+}
+
+.hero-content h1,
+.hero-content p,
+.hero-meta {
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.hero-content.fade-out h1,
+.hero-content.fade-out p,
+.hero-content.fade-out .hero-meta {
+  opacity: 0;
+  transform: translateY(10px);
+}
