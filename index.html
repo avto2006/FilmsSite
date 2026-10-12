@@ -1,11 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ka">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinematix — Premium Movie Streaming</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    
+<body class="dark-theme">
+
+  <!-- Header / Navigation -->
+  <header class="navbar">
+    <div class="logo">
+      <i class="fa-solid fa-film logo-icon"></i>
+      <span>Cinema<span class="highlight">tix</span></span>
+    </div>
+
+    <nav class="nav-links">
+      <a href="#hero" class="active"><i class="fa-solid fa-house"></i> მთავარი</a>
+      <a href="#trending"><i class="fa-solid fa-fire"></i> ტრენდული</a>
+      <a href="#categories"><i class="fa-solid fa-layer-group"></i> კატეგორიები</a>
+      <a href="#top-rated"><i class="fa-solid fa-star"></i> ტოპ რეიტინგული</a>
+      <a href="#watchlist"><i class="fa-solid fa-bookmark"></i> ჩემი სია (<span id="watchlist-count">0</span>)</a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="მოძებნე ფილმი...">
+      </div>
+      <button id="themeToggle" class="theme-btn" title="თემის შეცვლა">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Feature Section -->
+  <section id="hero" class="hero-section">
+    <div class="hero-backdrop" id="heroBackdrop"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="badge">დღის ფავორიტი</span>
+      <h1 id="heroTitle">loading...</h1>
+      <p id="heroDesc">ფილმის აღწერა იტვირთება...</p>
+      <div class="hero-meta">
+        <span id="heroRating"><i class="fa-solid fa-star"></i> 0.0</span>
+        <span id="heroYear">2026</span>
+        <span id="heroGenre">Action</span>
+      </div>
+      <div class="hero-buttons">
+        <button class="btn btn-primary" id="heroPlayBtn">
+          <i class="fa-solid fa-play"></i> ყურება
+        </button>
+        <button class="btn btn-secondary" id="heroBookmarkBtn">
+          <i class="fa-regular fa-bookmark"></i> სიაში დამატება
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter & Genre Bar -->
+  <section class="filter-section">
+    <div class="container">
+      <div class="genre-pills" id="genrePills">
+        <button class="pill active" data-genre="all">ყველა</button>
+        <button class="pill" data-genre="Action">Action</button>
+        <button class="pill" data-genre="Sci-Fi">Sci-Fi</button>
+        <button class="pill" data-genre="Drama">Drama</button>
+        <button class="pill" data-genre="Thriller">Thriller</button>
+        <button class="pill" data-genre="Crime">Crime</button>
+        <button class="pill" data-genre="Adventure">Adventure</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="main-content container">
+    <!-- Section 1: Trending -->
+    <section id="trending" class="movie-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-fire highlight"></i> ტრენდული ფილმები</h2>
+      </div>
+      <div class="movie-grid" id="trendingGrid"></div>
+    </section>
+
+    <!-- Section 2: Top Rated -->
+    <section id="top-rated" class="movie-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-star highlight"></i> ტოპ რეიტინგული</h2>
+      </div>
+      <div class="movie-grid" id="topRatedGrid"></div>
+    </section>
+
+    <!-- Section 3: All Movies -->
+    <section id="all-movies" class="movie-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-clapperboard highlight"></i> ყველა ფილმი</h2>
+      </div>
+      <div class="movie-grid" id="allMoviesGrid"></div>
+    </section>
+
+    <!-- Section 4: Watchlist -->
+    <section id="watchlist" class="movie-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-bookmark highlight"></i> ჩემი სია</h2>
+      </div>
+      <div class="movie-grid" id="watchlistGrid"></div>
+      <p id="emptyWatchlistMsg" class="empty-msg hidden">თქვენს სიაში ფილმები ჯერ არ არის დამატებული.</p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>&copy; 2026 <strong>Cinematix Platform</strong>. ყველა უფლება დაცულია.</p>
+      <div class="socials">
+        <a href="#"><i class="fa-brands fa-github"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Custom Video Player Modal -->
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">&times;</button>
+      <div class="video-wrapper">
+        <video id="mainVideoPlayer" controls autoplay>
+          <source src="" type="video/mp4">
+          თქვენს ბრაუზერს არ აქვს MP4 ვიდეოს მხარდაჭერა.
+        </video>
+      </div>
+      <div class="modal-info">
+        <h2 id="modalMovieTitle"></h2>
+        <p id="modalMovieDesc"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
