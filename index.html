@@ -76,12 +76,26 @@
 
   <main class="main-content container">
     <!-- Section 1: Trending -->
-    <section id="trending" class="movie-section">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-fire highlight"></i> ტრენდული ფილმები</h2>
-      </div>
-      <div class="movie-grid" id="trendingGrid"></div>
-    </section>
+  <!-- Section 1: Trending Carousel -->
+<section id="trending" class="movie-section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-fire highlight"></i> ტრენდული ფილმები</h2>
+  </div>
+  
+  <div class="carousel-wrapper">
+    <button id="prevTrending" class="carousel-btn prev-btn" aria-label="Previous">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    
+    <div class="carousel-container">
+      <div class="movie-grid carousel-track" id="trendingGrid"></div>
+    </div>
+
+    <button id="nextTrending" class="carousel-btn next-btn" aria-label="Next">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </div>
+</section>
 
     <!-- Section 2: Top Rated -->
     <section id="top-rated" class="movie-section">

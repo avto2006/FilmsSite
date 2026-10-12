@@ -6,6 +6,11 @@ let currentHeroIndex = 0;
 let heroSliderInterval = null;
 let heroMovies = [];
 
+// Carousel Variables
+let trendingPage = 0; // 0, 1, 2 (სულ 3 გვერდი, თითოზე 4 ფილმი = 12)
+let trendingInterval = null;
+const TOTAL_TRENDING_MOVIES = 12;
+
 // DOM Elements
 const trendingGrid = document.getElementById('trendingGrid');
 const topRatedGrid = document.getElementById('topRatedGrid');
@@ -18,20 +23,20 @@ const videoModal = document.getElementById('videoModal');
 const closeModal = document.getElementById('closeModal');
 const mainVideoPlayer = document.getElementById('mainVideoPlayer');
 const heroContent = document.querySelector('.hero-content');
+const prevTrendingBtn = document.getElementById('prevTrending');
+const nextTrendingBtn = document.getElementById('nextTrending');
 
 // Init Platform
 document.addEventListener('DOMContentLoaded', async () => {
   await fetchMovies();
   if (moviesData.length > 0) {
-    // ამოვიღოთ 5 ტრენდული/ფავორიტი ფილმი სლაიდერისთვის
     heroMovies = moviesData.filter(m => m.trending).slice(0, 5);
     if (heroMovies.length === 0) heroMovies = moviesData.slice(0, 5);
 
     setupHeroSlider();
     renderAllSections(moviesData);
+    setupTrendingCarousel();
     updateWatchlistBadge();
-  } else {
-    console.error('ფილმების მონაცემები ცარიელია!');
   }
 });
 
@@ -46,30 +51,25 @@ async function fetchMovies() {
   }
 }
 
-// Hero Slider (ყოველ 4 წამში იცვლება)
+// Hero Slider (4 წამი)
 function setupHeroSlider() {
   updateHeroContent(heroMovies[currentHeroIndex]);
 
-  // გავასუფთაოთ წინა ინტერვალი თუ არსებობდა
   if (heroSliderInterval) clearInterval(heroSliderInterval);
 
-  // 4000ms = 4 წამი
   heroSliderInterval = setInterval(() => {
     currentHeroIndex = (currentHeroIndex + 1) % heroMovies.length;
-    
-    // გლუვი გადასვლის (fade) ეფექტი
     if (heroContent) heroContent.classList.add('fade-out');
 
     setTimeout(() => {
       updateHeroContent(heroMovies[currentHeroIndex]);
       if (heroContent) heroContent.classList.remove('fade-out');
-    }, 400); // ტექსტის შეცვლა ანიმაციის ნახევარზე
+    }, 400);
   }, 4000);
 }
 
 function updateHeroContent(movie) {
   if (!movie) return;
-  
   document.getElementById('heroTitle').textContent = movie.title;
   document.getElementById('heroDesc').textContent = movie.description;
   document.getElementById('heroRating').innerHTML = `<i class="fa-solid fa-star"></i> ${movie.rating}`;
@@ -77,10 +77,8 @@ function updateHeroContent(movie) {
   document.getElementById('heroGenre').textContent = movie.genre;
   document.getElementById('heroBackdrop').style.backgroundImage = `url('${movie.backdrop}')`;
 
-  // Play Button
   document.getElementById('heroPlayBtn').onclick = () => openPlayer(movie);
   
-  // Bookmark Button Update
   const heroBookmarkBtn = document.getElementById('heroBookmarkBtn');
   if (heroBookmarkBtn) {
     const isBookmarked = watchlist.includes(movie.id);
@@ -89,9 +87,53 @@ function updateHeroContent(movie) {
   }
 }
 
+// Trending 12-Movie Carousel Setup
+function setupTrendingCarousel() {
+  const trendingMovies = moviesData.slice(0, TOTAL_TRENDING_MOVIES);
+  renderGrid(trendingGrid, trendingMovies);
+
+  startTrendingAutoSlide();
+
+  if (nextTrendingBtn) {
+    nextTrendingBtn.onclick = () => {
+      resetTrendingAutoSlide();
+      moveTrending(1);
+    };
+  }
+
+  if (prevTrendingBtn) {
+    prevTrendingBtn.onclick = () => {
+      resetTrendingAutoSlide();
+      moveTrending(-1);
+    };
+  }
+}
+
+function moveTrending(direction) {
+  const totalPages = Math.ceil(TOTAL_TRENDING_MOVIES / 4); // 3 გვერდი
+  trendingPage = (trendingPage + direction + totalPages) % totalPages;
+
+  // 100% ტრეკის გადაწევა + gap-ის გათვალისწინება
+  const offset = trendingPage * 100;
+  if (trendingGrid) {
+    trendingGrid.style.transform = `translateX(-${offset}%)`;
+  }
+}
+
+function startTrendingAutoSlide() {
+  if (trendingInterval) clearInterval(trendingInterval);
+  trendingInterval = setInterval(() => {
+    moveTrending(1);
+  }, 4000);
+}
+
+function resetTrendingAutoSlide() {
+  clearInterval(trendingInterval);
+  startTrendingAutoSlide();
+}
+
 // Render Grids
 function renderAllSections(movies) {
-  renderGrid(trendingGrid, movies.filter(m => m.trending));
   renderGrid(topRatedGrid, [...movies].sort((a, b) => b.rating - a.rating));
   renderGrid(allMoviesGrid, movies);
   renderWatchlist();
@@ -129,7 +171,7 @@ function renderGrid(container, movies) {
   });
 }
 
-// Watchlist Functionality
+// Watchlist
 function toggleWatchlist(e, movieId) {
   if (e) e.stopPropagation();
   if (watchlist.includes(movieId)) {
@@ -139,6 +181,7 @@ function toggleWatchlist(e, movieId) {
   }
   localStorage.setItem('cinematix_watchlist', JSON.stringify(watchlist));
   renderAllSections(moviesData);
+  setupTrendingCarousel();
   updateWatchlistBadge();
   updateHeroContent(heroMovies[currentHeroIndex]);
 }
@@ -159,7 +202,7 @@ function updateWatchlistBadge() {
   if (badge) badge.textContent = watchlist.length;
 }
 
-// Player Modal
+// Video Player Modal
 function openPlayer(movie) {
   document.getElementById('modalMovieTitle').textContent = movie.title;
   document.getElementById('modalMovieDesc').textContent = movie.description;
@@ -176,7 +219,7 @@ if (closeModal) {
   };
 }
 
-// Filtering & Search
+// Search & Genre Filter
 const genrePills = document.getElementById('genrePills');
 if (genrePills) {
   genrePills.addEventListener('click', (e) => {
@@ -200,7 +243,7 @@ if (searchInput) {
   });
 }
 
-// Theme Switcher
+// Theme Toggle
 if (themeToggle) {
   themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('light-theme');
