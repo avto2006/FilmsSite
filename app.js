@@ -243,6 +243,7 @@ if (searchInput) {
   });
 }
 // ffs
+// sjfsjf
 // Theme Toggle
 if (themeToggle) {
   themeToggle.addEventListener('click', () => {
