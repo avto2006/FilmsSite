@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (heroMovies.length === 0) heroMovies = moviesData.slice(0, 5);
 
     setupHeroSlider();
-    renderAllSections(moviesData);
     setupTrendingCarousel();
+    renderAllSections(moviesData);
     updateWatchlistBadge();
   }
 });
@@ -95,14 +95,16 @@ function setupTrendingCarousel() {
   startTrendingAutoSlide();
 
   if (nextTrendingBtn) {
-    nextTrendingBtn.onclick = () => {
+    nextTrendingBtn.onclick = (e) => {
+      e.preventDefault();
       resetTrendingAutoSlide();
       moveTrending(1);
     };
   }
 
   if (prevTrendingBtn) {
-    prevTrendingBtn.onclick = () => {
+    prevTrendingBtn.onclick = (e) => {
+      e.preventDefault();
       resetTrendingAutoSlide();
       moveTrending(-1);
     };
@@ -110,13 +112,12 @@ function setupTrendingCarousel() {
 }
 
 function moveTrending(direction) {
-  const totalPages = Math.ceil(TOTAL_TRENDING_MOVIES / 4); // 3 გვერდი
+  const totalPages = Math.ceil(TOTAL_TRENDING_MOVIES / 4); // 3 გვერდი (12 / 4)
   trendingPage = (trendingPage + direction + totalPages) % totalPages;
 
-  // 100% ტრეკის გადაწევა + gap-ის გათვალისწინება
-  const offset = trendingPage * 100;
   if (trendingGrid) {
-    trendingGrid.style.transform = `translateX(-${offset}%)`;
+    // 100% + 20px gap-ის ზუსტი გამოთვლა calc()-ით
+    trendingGrid.style.transform = `translateX(calc(-${trendingPage * 100}% - ${trendingPage * 20}px))`;
   }
 }
 
@@ -180,10 +181,23 @@ function toggleWatchlist(e, movieId) {
     watchlist.push(movieId);
   }
   localStorage.setItem('cinematix_watchlist', JSON.stringify(watchlist));
+  
+  // განვაახლოთ მხოლოდ Bookmark იკონები, რომ კარუსელის პოზიცია არ დაიკარგოს
+  updateBookmarkState(movieId);
   renderAllSections(moviesData);
-  setupTrendingCarousel();
   updateWatchlistBadge();
   updateHeroContent(heroMovies[currentHeroIndex]);
+}
+
+function updateBookmarkState(movieId) {
+  const isBookmarked = watchlist.includes(movieId);
+  document.querySelectorAll(`.movie-card`).forEach(card => {
+    const bookmarkBtn = card.querySelector('.bookmark-icon');
+    if (bookmarkBtn && card.innerHTML.includes(`toggleWatchlist(event, ${movieId})`)) {
+      bookmarkBtn.classList.toggle('active', isBookmarked);
+      bookmarkBtn.innerHTML = `<i class="fa-${isBookmarked ? 'solid' : 'regular'} fa-bookmark"></i>`;
+    }
+  });
 }
 
 function renderWatchlist() {
@@ -242,8 +256,7 @@ if (searchInput) {
     renderAllSections(filtered);
   });
 }
-// ffs
-// sjfsjf
+
 // Theme Toggle
 if (themeToggle) {
   themeToggle.addEventListener('click', () => {
